@@ -3,7 +3,7 @@ class Database {
     private $host = 'localhost';
     private $db_name = 'lms_system';
     private $username = 'root';
-    private $password = '';
+    private $password = '44413138';
     private $conn;
 
     public function connect() {

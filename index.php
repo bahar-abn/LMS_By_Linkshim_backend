@@ -1,55 +1,56 @@
 <?php
 require_once 'core/Session.php';
+require_once 'config/constants.php';
 $session = new Session();
 
 // Simple routing
 $request = $_SERVER['REQUEST_URI'];
-$base_path = '/';
+$request = str_replace(BASE_URL, '', $request);
 
 switch ($request) {
-    case $base_path:
-    case $base_path . 'login':
+    case '':
+    case 'login':
         require 'controllers/AuthController.php';
         $auth = new AuthController();
         $auth->login();
         break;
 
-    case $base_path . 'register':
+    case 'register':
         require 'controllers/AuthController.php';
         $auth = new AuthController();
         $auth->register();
         break;
 
-    case $base_path . 'logout':
+    case 'logout':
         require 'controllers/AuthController.php';
         $auth = new AuthController();
         $auth->logout();
         break;
 
-    case $base_path . 'admin/dashboard':
+    case 'admin/dashboard':
         if($session->isAdmin()) {
             echo "Admin Dashboard";
-            // Here you would include the admin dashboard view
         } else {
-            header('Location: /login');
+            header('Location: ' . BASE_URL . 'login');
+            exit;
         }
         break;
 
-    case $base_path . 'instructor/dashboard':
+    case 'instructor/dashboard':
         if($session->isInstructor()) {
             echo "Instructor Dashboard";
-            // Here you would include the instructor dashboard view
         } else {
-            header('Location: /login');
+            header('Location: ' . BASE_URL . 'login');
+            exit;
         }
         break;
 
-    case $base_path . 'student/dashboard':
+    case 'student/dashboard':
         if($session->isStudent()) {
             echo "Student Dashboard";
-            // Here you would include the student dashboard view
         } else {
-            header('Location: /login');
+            header('Location: ' . BASE_URL . 'login');
+            exit;
         }
         break;
 
