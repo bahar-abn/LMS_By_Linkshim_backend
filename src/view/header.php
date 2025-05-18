@@ -18,7 +18,7 @@
             <nav class="hidden md:flex items-center space-x-6">
                 <a href="#" class="text-gray-700 hover:text-blue-600 transition">home</a>
                 <a href="#" class="text-gray-700 hover:text-blue-600 transition">assignment</a>
-                <a href="#" class="text-gray-700 hover:text-blue-600 transition">profile</a>
+                           <a href="#" class="text-gray-700 hover:text-blue-600 transition">profile</a>
                 <!-- Login Button -->
                 <a href="../controller/authentication.php" class="ml-4 inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
                     Login

@@ -16,14 +16,16 @@
             <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Go</button>
         </form>
     </div>
-
+simple
     <?php if($assignments) { ?>
         <div class="space-y-4">
             <?php foreach ($assignments as $assignment) : ?>
                 <div class="bg-white p-4 rounded shadow flex justify-between items-center">
                     <div>
-                        <p class="font-semibold text-gray-700"><?= $assignment['courseName'] ?></p>
-                        <p><?= $assignment['Description']; ?></p>
+                        <p class="font-semibold text-gray-700">
+                            <?= isset($assignment['courseName']) ? htmlspecialchars($assignment['courseName']) : 'Unknown Course' ?>
+                        </p>
+                        <p><?= htmlspecialchars($assignment['Description']); ?></p>
                     </div>
                     <form action="." method="post">
                         <input type="hidden" name="action" value="delete_assignment">

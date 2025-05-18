@@ -1,11 +1,20 @@
-<?php 
+
+<?php
 
     function get_assignments_by_course($course_id) {
-        global $db;
+        $db = Database::getDB();
+
         if ($course_id) {
-            $query = 'SELECT A.ID, A.Description, C.courseName FROM assignments A LEFT JOIN courses C ON A.courseID = C.courseID WHERE A.courseID = :course_id ORDER BY ID';
+            $query = 'SELECT A.ID, A.Description, A.courseID, C.courseName 
+                      FROM assignments A 
+                      LEFT JOIN courses C ON A.courseID = C.courseID 
+                      WHERE A.courseID = :course_id 
+                      ORDER BY ID';
         } else {
-            $query = 'SELECT A.ID, A.Description, C.courseName FROM assignments A LEFT JOIN courses C ON A.courseID = C.courseID ORDER BY C.courseID';
+            $query = 'SELECT A.ID, A.Description, A.courseID, C.courseName 
+                      FROM assignments A 
+                      LEFT JOIN courses C ON A.courseID = C.courseID 
+                      ORDER BY C.courseID';
         }
         $statement = $db->prepare($query);
         if ($course_id) {
@@ -17,9 +26,11 @@
         return $assignments;
     }
 
-    function delete_assignment($assignment_id) {
-        global $db;
-        $query = 'DELETE FROM assignments WHERE ID = :assign_id';
+
+function delete_assignment($assignment_id) {
+    $db = Database::getDB();
+
+    $query = 'DELETE FROM assignments WHERE ID = :assign_id';
         $statement = $db->prepare($query);
         $statement->bindValue(':assign_id', $assignment_id);
         $statement->execute();
@@ -27,7 +38,8 @@
     }
 
     function add_assignment($course_id, $description) {
-        global $db;
+        $db = Database::getDB();
+
         $query = 'INSERT INTO assignments (Description, courseID)
               VALUES
                  (:descr, :courseID)';

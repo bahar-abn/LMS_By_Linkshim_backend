@@ -1,15 +1,23 @@
 <?php
-$dsn = 'mysql:host=localhost;dbname=assignment_tracher'; // اصلاح شد
-$username = 'root';
-//$password = 'pa55word';
+class Database {
+    private static $dsn = 'mysql:host=localhost;dbname=assignment_tracher';
+    private static $username = 'root';
+    private static $password = '';
+    private static $db;
 
-try {
-    $db = new PDO($dsn, $username);
-    //$db = new PDO($dsn, $username, $password);
-} catch (PDOException $e) {
-    $error = "Database Error: ";
-    $error .= $e->getMessage();
-    include('view/error.php');
-    exit();
+    private function __construct() {}
+
+    public static function getDB() {
+        if (!isset(self::$db)) {
+            try {
+                self::$db = new PDO(self::$dsn, self::$username, self::$password);
+                self::$db->exec("SET NAMES 'utf8'");
+            } catch (PDOException $e) {
+                $error = "Database Error: " . $e->getMessage();
+                include(__DIR__ . '/../view/error.php');
+                exit();
+            }
+        }
+        return self::$db;
+    }
 }
-?>
