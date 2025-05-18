@@ -1,11 +1,10 @@
 <?php
 require_once __DIR__ . '/../config/database.php';
 class User {
-    private $db; // متغیر خصوصی برای نگهداری اتصال دیتابیس
+    private $db;
 
-    // سازنده کلاس
     public function __construct() {
-        $this->db = new Database(); // ساخت یک شیء از کلاس Database برای اتصال به دیتابیس
+        $this->db = new Database();
     }
 
     // متد ثبت‌نام کاربر جدید
@@ -22,13 +21,13 @@ class User {
         $stmt->bindParam(':name', $data['name']);
         $stmt->bindParam(':email', $data['email']);
         $stmt->bindParam(':password', $data['password']); // رمز عبور هش شده
-        $stmt->bindParam(':role', $data['role']); // نقش کاربر (مثلاً student)
+        $stmt->bindParam(':role', $data['role']);
 
         // اجرای کوئری
         if($stmt->execute()) {
-            return true; // اگر موفق بود
+            return true;
         } else {
-            return false; // اگر خطا رخ داد
+            return false;
         }
     }
 
@@ -44,17 +43,17 @@ class User {
 
         $user = $stmt->fetch(PDO::FETCH_ASSOC); // دریافت اطلاعات کاربر به صورت آرایه
 
-        // بررسی اینکه کاربر وجود دارد و رمز درست است
+
         if($user && password_verify($password, $user['password'])) {
-            return $user; // موفقیت در ورود - برگرداندن اطلاعات کاربر
+            return $user;
         } else {
-            return false; // رمز نادرست یا کاربر وجود ندارد
+            return false;
         }
     }
 
     // بررسی اینکه آیا ایمیل تکراری است یا نه
     public function findUserByEmail($email) {
-        $conn = $this->db->connect(); // اتصال به دیتابیس
+        $conn = $this->db->connect();
 
         $query = 'SELECT * FROM users WHERE email = :email';
         $stmt = $conn->prepare($query);
@@ -63,9 +62,9 @@ class User {
 
         // بررسی اینکه آیا سطری با این ایمیل وجود دارد
         if($stmt->rowCount() > 0) {
-            return true; // ایمیل قبلاً ثبت شده
+            return true;
         } else {
-            return false; // ایمیل جدید است
+            return false;
         }
     }
 
