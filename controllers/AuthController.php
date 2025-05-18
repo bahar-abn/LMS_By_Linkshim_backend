@@ -1,68 +1,65 @@
 <?php
-require_once 'models/User.php';        // بارگذاری مدل User برای کار با کاربران در دیتابیس
-require_once 'core/Session.php';       // بارگذاری کلاس Session برای مدیریت نشست کاربران
+require_once 'models/User.php';
+require_once 'core/Session.php';
 
 class AuthController {
-    private $userModel;                // متغیر برای نگهداری شیء مدل User
-    private $session;                  // متغیر برای نگهداری شیء کلاس Session
+    private $userModel;
+    private $session;
 
     public function __construct() {
-        $this->userModel = new User();     // ایجاد شیء از کلاس User
-        $this->session = new Session();    // ایجاد شیء از کلاس Session
+        $this->userModel = new User();
+        $this->session = new Session();
     }
 
-    // متد ثبت‌نام کاربر
+
     public function register() {
-        // بررسی اینکه آیا درخواست از نوع POST است
+
         if($_SERVER['REQUEST_METHOD'] == 'POST') {
-            // پاک‌سازی داده‌های ارسال‌شده
             $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
 
-            // مقداردهی اولیه به متغیرهای فرم
             $data = [
-                'name' => trim($_POST['name']),                         // نام
-                'email' => trim($_POST['email']),                       // ایمیل
-                'password' => trim($_POST['password']),                 // رمز عبور
-                'confirm_password' => trim($_POST['confirm_password']), // تایید رمز عبور
-                'role' => 'student',                                    // نقش پیش‌فرض دانشجو
-                'name_err' => '',                                       // خطاهای نام
-                'email_err' => '',                                      // خطاهای ایمیل
-                'password_err' => '',                                   // خطاهای رمز
-                'confirm_password_err' => ''                            // خطاهای تایید رمز
+                'name' => trim($_POST['name']),
+                'email' => trim($_POST['email']),
+                'password' => trim($_POST['password']),
+                'confirm_password' => trim($_POST['confirm_password']),
+                'role' => 'student',
+                'name_err' => '',
+                'email_err' => '',
+                'password_err' => '',
+                'confirm_password_err' => ''
             ];
 
             // اعتبارسنجی ایمیل
             if(empty($data['email'])) {
-                $data['email_err'] = 'Please enter email';             // ایمیل خالی است
-            } else {
+                $data['email_err'] = 'Please enter email';
+            }else {
                 // بررسی وجود ایمیل در دیتابیس
                 if($this->userModel->findUserByEmail($data['email'])) {
-                    $data['email_err'] = 'Email is already taken';     // ایمیل تکراری است
+                    $data['email_err'] = 'Email is already taken';
                 }
             }
 
             // اعتبارسنجی نام
             if(empty($data['name'])) {
-                $data['name_err'] = 'Please enter name';               // نام خالی است
+                $data['name_err'] = 'Please enter name';
             }
 
             // اعتبارسنجی رمز عبور
             if(empty($data['password'])) {
-                $data['password_err'] = 'Please enter password';       // رمز خالی است
-            } elseif(strlen($data['password']) < 6) {
-                $data['password_err'] = 'Password must be at least 6 characters'; // رمز کوتاه است
+                $data['password_err'] = 'Please enter password';       }
+            elseif(strlen($data['password']) < 6) {
+                $data['password_err'] = 'Password must be at least 6 characters';
             }
 
             // اعتبارسنجی تایید رمز
             if(empty($data['confirm_password'])) {
-                $data['confirm_password_err'] = 'Please confirm password'; // تایید رمز خالی است
-            } else {
+                $data['confirm_password_err'] = 'Please confirm password'; }
+            else {
                 if($data['password'] != $data['confirm_password']) {
-                    $data['confirm_password_err'] = 'Passwords do not match'; // رمزها تطابق ندارند
+                    $data['confirm_password_err'] = 'Passwords do not match';
                 }
             }
 
-            // بررسی اینکه هیچ خطایی وجود ندارد
             if(empty($data['email_err']) && empty($data['name_err']) &&
                 empty($data['password_err']) && empty($data['confirm_password_err'])) {
 
@@ -72,7 +69,7 @@ class AuthController {
                 // ثبت کاربر در دیتابیس
                 if($this->userModel->register($data)) {
                     // هدایت به صفحه ورود پس از ثبت موفق
-                    header('location: /login');
+                    echo('welcome');
                 } else {
                     die('Something went wrong'); // خطای غیرمنتظره
                 }
@@ -101,34 +98,34 @@ class AuthController {
 
     // متد ورود کاربر
     public function login() {
-        // بررسی اینکه آیا درخواست POST است
+
         if($_SERVER['REQUEST_METHOD'] == 'POST') {
-            // پاک‌سازی داده‌های ارسال شده
+            // پاک‌سازی داده‌ها برای اینکه خطا بوجود نیاد
             $_POST = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
 
             // مقداردهی داده‌ها
             $data = [
-                'email' => trim($_POST['email']),            // ایمیل
-                'password' => trim($_POST['password']),      // رمز عبور
-                'email_err' => '',                           // خطاهای ایمیل
-                'password_err' => '',                        // خطاهای رمز
+                'email' => trim($_POST['email']),
+                'password' => trim($_POST['password']),
+                'email_err' => '',
+                'password_err' => '',
             ];
 
             // بررسی ایمیل
             if(empty($data['email'])) {
-                $data['email_err'] = 'Please enter email';   // ایمیل خالی است
+                $data['email_err'] = 'Please enter email';
             }
 
             // بررسی رمز عبور
             if(empty($data['password'])) {
-                $data['password_err'] = 'Please enter password'; // رمز خالی است
+                $data['password_err'] = 'Please enter password';
             }
 
             // بررسی وجود کاربر
             if($this->userModel->findUserByEmail($data['email'])) {
-                // کاربر پیدا شد
+
             } else {
-                $data['email_err'] = 'No user found';        // کاربر پیدا نشد
+                $data['email_err'] = 'No user found';
             }
 
             // بررسی خطاها
@@ -137,7 +134,7 @@ class AuthController {
                 $loggedInUser = $this->userModel->login($data['email'], $data['password']);
 
                 if($loggedInUser) {
-                    // ساخت نشست برای کاربر واردشده
+                    // ساخت سشن برای کاربر واردشده
                     $this->session->set('user_id', $loggedInUser['id']);
                     $this->session->set('user_email', $loggedInUser['email']);
                     $this->session->set('user_name', $loggedInUser['name']);
@@ -146,8 +143,8 @@ class AuthController {
                     // هدایت کاربر براساس نقش او
                     $this->redirectBasedOnRole($loggedInUser['role']);
                 } else {
-                    $data['password_err'] = 'Password incorrect'; // رمز اشتباه است
-                    $this->view('auth/login', $data);             // نمایش فرم با خطا
+                    $data['password_err'] = 'Password incorrect';
+                    $this->view('auth/login', $data);
                 }
             } else {
                 // نمایش مجدد فرم با خطاها
@@ -173,7 +170,7 @@ class AuthController {
         header('location: ' . BASE_URL . 'login');// هدایت به صفحه ورود
     }
 
-    // هدایت کاربر به داشبورد مناسب بر اساس نقش او
+    // هدایت  به داشبورد مناسب بر اساس نقش
     private function redirectBasedOnRole($role) {
         switch($role) {
             case 'admin':
