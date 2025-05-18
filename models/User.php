@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../config/database.php';
+
 class User {
     private $db;
 
@@ -7,76 +8,63 @@ class User {
         $this->db = new Database();
     }
 
-    // متد ثبت‌نام کاربر جدید
     public function register($data) {
-        $conn = $this->db->connect(); // اتصال به دیتابیس
-
-        // تعریف کوئری SQL برای درج کاربر جدید
-        $query = 'INSERT INTO users (name, email, password, role) 
-                  VALUES (:name, :email, :password, :role)';
-
-        $stmt = $conn->prepare($query); // آماده‌سازی کوئری برای جلوگیری از حملات SQL Injection
-
-        // مقداردهی پارامترها
+        $conn = $this->db->connect();
+        $query = 'INSERT INTO users (name, email, password, role) VALUES (:name, :email, :password, :role)';
+        $stmt = $conn->prepare($query);
         $stmt->bindParam(':name', $data['name']);
         $stmt->bindParam(':email', $data['email']);
-        $stmt->bindParam(':password', $data['password']); // رمز عبور هش شده
+        $stmt->bindParam(':password', $data['password']);
         $stmt->bindParam(':role', $data['role']);
-
-        // اجرای کوئری
-        if($stmt->execute()) {
-            return true;
-        } else {
-            return false;
-        }
+        return $stmt->execute();
     }
 
-    // متد ورود کاربر
     public function login($email, $password) {
-        $conn = $this->db->connect(); // اتصال به دیتابیس
-
-        // کوئری برای دریافت اطلاعات کاربر بر اساس ایمیل
+        $conn = $this->db->connect();
         $query = 'SELECT * FROM users WHERE email = :email';
         $stmt = $conn->prepare($query);
         $stmt->bindParam(':email', $email);
         $stmt->execute();
-
-        $user = $stmt->fetch(PDO::FETCH_ASSOC); // دریافت اطلاعات کاربر به صورت آرایه
-
-
-        if($user && password_verify($password, $user['password'])) {
-            return $user;
-        } else {
-            return false;
-        }
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        return ($user && password_verify($password, $user['password'])) ? $user : false;
     }
 
-    // بررسی اینکه آیا ایمیل تکراری است یا نه
     public function findUserByEmail($email) {
         $conn = $this->db->connect();
-
-        $query = 'SELECT * FROM users WHERE email = :email';
-        $stmt = $conn->prepare($query);
+        $stmt = $conn->prepare('SELECT * FROM users WHERE email = :email');
         $stmt->bindParam(':email', $email);
         $stmt->execute();
-
-        // بررسی اینکه آیا سطری با این ایمیل وجود دارد
-        if($stmt->rowCount() > 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return $stmt->rowCount() > 0;
     }
 
-    // گرفتن اطلاعات کاربر بر اساس ID
     public function getUserById($id) {
-        $conn = $this->db->connect(); // اتصال به دیتابیس
-
-        $query = 'SELECT * FROM users WHERE id = :id';
-        $stmt = $conn->prepare($query);
+        $conn = $this->db->connect();
+        $stmt = $conn->prepare('SELECT * FROM users WHERE id = :id');
         $stmt->bindParam(':id', $id);
         $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 
-        return $stmt->fetch(PDO::FETCH_ASSOC); // برگرداندن اطلاعات کاربر
+    public function getAllUsers() {
+        $conn = $this->db->connect();
+        $stmt = $conn->query('SELECT * FROM users');
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function deleteUser($id) {
+        $conn = $this->db->connect();
+        $stmt = $conn->prepare('DELETE FROM users WHERE id = :id');
+        $stmt->bindParam(':id', $id);
+        return $stmt->execute();
+    }
+
+    public function updateUser($id, $name, $email, $role) {
+        $conn = $this->db->connect();
+        $stmt = $conn->prepare('UPDATE users SET name = :name, email = :email, role = :role WHERE id = :id');
+        $stmt->bindParam(':name', $name);
+        $stmt->bindParam(':email', $email);
+        $stmt->bindParam(':role', $role);
+        $stmt->bindParam(':id', $id);
+        return $stmt->execute();
     }
 }
